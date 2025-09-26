@@ -30,7 +30,7 @@ export default async function handler(req, res) {
 
   const client = new OpenAI({
     apiKey: process.env.API_KEY,
-    baseURL: "https://openrouter.ai/v1"
+    baseURL: "https://openrouter.ai/api/v1"
   });
 
   try {
