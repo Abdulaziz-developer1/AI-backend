@@ -1,0 +1,5 @@
+touch .gitignore
+
+# Open .gitignore and add:
+node_modules
+.env
