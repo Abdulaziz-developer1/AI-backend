@@ -32,20 +32,34 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: "No message(s) provided" });
   }
 
+  // Always inject a system instruction first
+  const systemPrompt = {
+    role: "system",
+    content:
+      "You are a helpful assistant. Never say you are Grok, OpenAI, ChatGPT, or an AI model. Always reply neutrally as 'Assistant'. Avoid mentioning model names or providers."
+  };
+
+  // Merge system prompt with user chat
+  const finalMessages = [systemPrompt, ...chatMessages];
+
   const client = new OpenAI({
     apiKey: process.env.API_KEY,
     baseURL: "https://openrouter.ai/api/v1",
   });
 
   try {
-    console.log("➡️ Sending to OpenRouter:", chatMessages);
+    console.log("➡️ Sending to OpenRouter:", finalMessages);
 
     const response = await client.chat.completions.create({
       model: "x-ai/grok-4-fast:free",
-      messages: chatMessages,
+      messages: finalMessages,
     });
 
-    reply = response.choices?.[0]?.message?.content;
+    reply = response.choices?.[0]?.message?.content || "";
+
+    // --- Sanitize just in case ---
+    reply = reply.replace(/grok|openai|chatgpt/gi, "assistant");
+
     fullResponse = response;
 
     console.log("✅ Got reply:", reply);
@@ -61,5 +75,7 @@ export default async function handler(req, res) {
     }
   }
 
-  res.status(200).json({ reply, error: errorMessage, type: errorType, fullResponse });
+  res
+    .status(200)
+    .json({ reply, error: errorMessage, type: errorType, fullResponse });
 }
