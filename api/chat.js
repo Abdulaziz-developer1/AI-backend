@@ -44,7 +44,7 @@ export default async function handler(req, res) {
 
   const client = new OpenAI({
     apiKey: process.env.API_KEY,
-    baseURL: "https://openrouter.ai/api/v1",
+    baseURL: "deepseek/deepseek-chat-v3.1:free",
   });
 
   try {
